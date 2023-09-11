@@ -105,6 +105,7 @@ export default function Chat() {
                     const timestampB = new Date(b.latestMessageTimestamp).getTime();
                     return timestampA - timestampB;
                 });
+                setChats(responseData);
                  
                 
             })
@@ -126,11 +127,9 @@ export default function Chat() {
         const headers = {
             Authorization:`Bearer ${localStorage.getItem("X-AUTH")}`
         }
-
+        console.log("fetchDataOnScroll");
         const response = await api.get(`/contact?pageNumber=${pageNumber}&pageSize=${pageSize}`,{headers})
-                        .then(response => {
-
-                                    
+                        .then(response => {        
                             setChats((prevChats) => [...prevChats, ...response.data]);        
                         })
         .catch(error => {
