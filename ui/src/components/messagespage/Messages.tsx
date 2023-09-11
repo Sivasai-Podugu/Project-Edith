@@ -10,7 +10,7 @@ import { Loading } from '../loading/Loading'
 
 
 type MessagesTypes = {
-    senderid:number,
+    senderId:number,
     message:string,
     timestamp:string,
 }
@@ -161,11 +161,11 @@ export const Messages = () => {
     const RenderMessages = ():any => {
         return (
             history?.map((msg,index)=>{
-                if(msg.senderid == Number(id)){
-                    return <ReceivedMessage key={index} text={msg.message} time={msg.timestamp.slice(0, 19).replace('T', ' ')} name={user.name} />
+                if(msg.senderId == Number(id)){
+                    return <ReceivedMessage key={index} text={msg.message} time={msg.timestamp && msg.timestamp.slice(0, 19).replace('T', ' ')} name={user.name} />
                 }
                 else{
-                    return <SendMessage key={index} text={msg.message} time={msg.timestamp.slice(0, 19).replace('T', ' ')} name={sendername} />
+                    return <SendMessage key={index} text={msg.message} time={msg.timestamp && msg.timestamp.slice(0, 19).replace('T', ' ')} name={sendername} />
                 }
             })
           

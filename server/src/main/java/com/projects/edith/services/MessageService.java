@@ -30,7 +30,7 @@ public class MessageService {
     public ResponseEntity<?> getHistory(Integer id2,String ownerEmail){
         try{
             Integer id1 = userRepository.findByEmail(ownerEmail).getId();
-            return ResponseEntity.ok(messageRepository.findAllBySenderIdAndReceiverIdOrReceiverIdAndSenderIdOrderByTimestampDesc(id1,id2,id2,id1));
+            return ResponseEntity.ok(messageRepository.findMessagesByUserIds(id1,id2));
         }catch (Exception e){
             String errorMessage = "An error occurred while getting history: " + e.getMessage();
             CustomException errorResponse = new CustomException(errorMessage);

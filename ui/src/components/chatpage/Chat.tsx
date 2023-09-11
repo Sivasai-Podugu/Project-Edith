@@ -89,9 +89,22 @@ export default function Chat() {
         }
         await api.get(`/contact?pageNumber=${pageNumber}&pageSize=${pageSize}`,{headers})
             .then(response => {
-                const responseData: ChatDataTypes[] = response.data
-                setChats(responseData)
-                sessionStorage.setItem("user",JSON.stringify(responseData))
+                const responseData: ChatDataTypes[] = response.data;
+                console.log(responseData);
+                responseData.sort((a, b) => {
+                    if (a.latestMessageTimestamp === null && b.latestMessageTimestamp === null) {
+                        return 0;
+                    }
+                    if (a.latestMessageTimestamp === null) {
+                        return 1;
+                    }
+                    if (b.latestMessageTimestamp === null) {
+                        return -1;
+                    }
+                    const timestampA = new Date(a.latestMessageTimestamp).getTime();
+                    const timestampB = new Date(b.latestMessageTimestamp).getTime();
+                    return timestampA - timestampB;
+                });
                  
                 
             })
@@ -116,10 +129,8 @@ export default function Chat() {
 
         const response = await api.get(`/contact?pageNumber=${pageNumber}&pageSize=${pageSize}`,{headers})
                         .then(response => {
-                            
-                            
-            
-                            
+
+                                    
                             setChats((prevChats) => [...prevChats, ...response.data]);        
                         })
         .catch(error => {
