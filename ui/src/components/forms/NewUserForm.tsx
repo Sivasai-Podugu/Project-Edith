@@ -30,9 +30,9 @@ export const NewUserForm = ({formType}:NewUserFormType) => {
     const {errors} = formState
     const onSubmit = async (data:NewUserFormElementTypes) => {
         const headers = {
-            Authorization:`Bearer ${localStorage.getItem("Jwt")}`
+            Authorization:`Bearer ${localStorage.getItem("X-AUTH")}`
         }
-        await api.post("/addcontact",data,{headers})
+        await api.post("/contact",data,{headers})
             .then(response => {
                  
                 setIsSuccess(true);

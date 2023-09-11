@@ -3,7 +3,6 @@ type ConfirmModalTypes = {
 }
 export const ConfirmModal = ({toggleModal}:ConfirmModalTypes) => {
     
-    
 
   return (
     <>

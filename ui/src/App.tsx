@@ -1,7 +1,7 @@
 import { Login } from './components/Login';
 import './App.css'
-import Chat from './components/Chat';
-import { Messages } from './components/Messages';
+import Chat from './components/chatpage/Chat';
+import { Messages } from './components/messagespage/Messages';
 import { Registration } from './components/Registration';
 
 import { Navigate, Route, Router, Routes } from 'react-router-dom';

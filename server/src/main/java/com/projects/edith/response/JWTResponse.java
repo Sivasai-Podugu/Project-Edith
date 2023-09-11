@@ -9,8 +9,4 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class JWTResponse implements Serializable {
     private String jwt;
-
-    public JWTResponse() {
-        super();
-    }
 }

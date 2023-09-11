@@ -3,7 +3,7 @@ package com.projects.edith.services;
 import com.projects.edith.exception.CustomException;
 import com.projects.edith.mapper.UserMapper;
 import com.projects.edith.models.User;
-import com.projects.edith.repo.UserRepository;
+import com.projects.edith.repositories.UserRepository;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 
 
@@ -58,14 +59,14 @@ public class UserService implements UserDetailsService {
 
 
     public ResponseEntity<?> getProfile(String email){
-        return ResponseEntity.ok(userMapper.userToUserResponseDto(userRepository.findByEmail(email)));
+        return ResponseEntity.ok(userMapper.map(userRepository.findByEmail(email)));
     }
 
 
     public ResponseEntity<?> getUser(Integer id){
         try{
             if(userRepository.existsById(id)){
-                return ResponseEntity.ok(userMapper.userToUserResponseDto(userRepository.findById(id).get()));
+                return ResponseEntity.ok(userMapper.map(userRepository.findById(id).get()));
             }else{
                 throw new Exception("User not found");
             }

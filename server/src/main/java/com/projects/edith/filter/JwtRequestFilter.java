@@ -1,16 +1,10 @@
 package com.projects.edith.filter;
 
 
-
-import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.projects.edith.services.JwtService;
 import com.projects.edith.services.UserService;
-import com.projects.edith.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,24 +12,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
+@Log4j2
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private JwtUtil jwtTokenUtil;
+    private JwtService jwtTokenService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        if(request.getRequestURI().equalsIgnoreCase("/login")){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return request.getRequestURI().equalsIgnoreCase("/login");
     }
 
     @Override
@@ -49,25 +44,27 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtTokenUtil.extractUsername(jwtToken);
+                username = jwtTokenService.extractUsername(jwtToken);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                    UserDetails userDetails = this.userService.loadUserByUsername(username);
+                    if (jwtTokenService.validateToken(jwtToken, userDetails)) {
+
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken
+                                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    }
+                }
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
+
+                log.info("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                log.info("JWT Token has expired");
             }
         }
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.userService.loadUserByUsername(username);
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
         chain.doFilter(request, response);
     }
 

@@ -34,18 +34,18 @@ export const Registration = () => {
 
   const { errors } = formState;
 
-  const onSubmit = async (data: RegistrationForm) => {
+  const onSubmit = async (data: RegistrationForm) => { 
      
 
-    await api.post("/register",(data))
-        .then((response)=>{
+    await api.post("/user/register",(data))
+        .then(()=>{
           setIsSuccess(true);
           setIsError(false)
           setMessage("Registered Successfully.. Go to Login Page to signin...")
              
         })
         .catch(error=>{
-          console.log(error.response);
+          
           setIsError(true);
           setIsSuccess(false);
           setMessage(error.response.data.errorMessage)

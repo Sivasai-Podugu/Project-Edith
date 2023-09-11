@@ -1,7 +1,7 @@
 package com.projects.edith.controller;
 
-import com.projects.edith.dtos.UserRegisterDto;
 import com.projects.edith.mapper.UserMapper;
+import com.projects.edith.request.UserRegisterRequest;
 import com.projects.edith.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -17,15 +18,15 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterDto userRegisterDto){
-        return userService.save(userMapper.userRegisterDtoToUser(userRegisterDto));
+    public ResponseEntity<?> register(@RequestBody UserRegisterRequest userRegisterRequest){
+        return userService.save(userMapper.map(userRegisterRequest));
     }
-    @GetMapping("/profile")
+    @GetMapping
     public ResponseEntity<?> getProfile(Authentication authentication){
         return userService.getProfile(((UserDetails)authentication.getPrincipal()).getUsername());
     }
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getProfile(@PathVariable("id") Integer id){
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") Integer id){
         return userService.getUser(id);
     }
 

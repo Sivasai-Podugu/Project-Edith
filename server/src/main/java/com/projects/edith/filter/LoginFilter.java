@@ -3,8 +3,8 @@ package com.projects.edith.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projects.edith.request.JwtRequest;
 import com.projects.edith.response.JWTResponse;
+import com.projects.edith.services.JwtService;
 import com.projects.edith.services.UserService;
-import com.projects.edith.util.JwtUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -34,7 +35,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    JwtUtil jwtUtil;
+    JwtService jwtService;
 
 
     private final RequestMatcher loginRequestMatcher = new AntPathRequestMatcher("/login",
@@ -50,30 +51,22 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
         Authentication auth = null;
 
-        System.out.println("attemptAuthentication");
+        log.info("attemptAuthentication");
 
 
 
         if(isLoginRequest(request)){
             try {
                 JwtRequest creds = new ObjectMapper().readValue(request.getInputStream(), JwtRequest.class);
-                System.out.println("password: "+ creds.getPassword());
+                log.info("password: "+ creds.getPassword());
 
                 UserDetails userDetails = employeeService.loadUserByUsername(creds.getEmail());
                 if(userDetails.getUsername().isEmpty()){
                     throw new Exception("Invalid Username");
                 }
-                System.out.println("loaded user");
+                log.info("loaded user");
                 Authentication authentication = employeeService.authenticate(creds.getEmail(),creds.getPassword());
                 if((!userDetails.getUsername().isEmpty()) && authentication != null){
-                    final String jwt = jwtUtil.generateToken(userDetails);
-                    Cookie cookie = new Cookie("UserJwt", jwt);
-                    System.out.println("JWt created...");
-                    cookie.setPath("/");
-
-                    cookie.setMaxAge(3600*24);
-
-                    response.addCookie(cookie);
                     auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     return auth;
                 }
@@ -98,25 +91,22 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
                                             Authentication authResult) throws IOException, ServletException {
 
         if (authResult != null) {
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
-            context.setAuthentication(authResult);
-            SecurityContextHolder.setContext(context);
-
-
-            String token = jwtUtil.generateToken((UserDetails) authResult.getPrincipal());
-
+            String token = jwtService.generateToken((UserDetails) authResult.getPrincipal());
             JWTResponse jwtResponse = new JWTResponse(token);
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonResponse = objectMapper.writeValueAsString(jwtResponse);
             response.setContentType("application/json");
             response.getWriter().write(jsonResponse);
+            Cookie cookie = new Cookie("X-AUTH", token);
+            cookie.setPath("/");
+            cookie.setMaxAge(24*3600*3600);
+            cookie.isHttpOnly();
+            response.addCookie(cookie);
 
-            Cookie springCookie = new Cookie("Jwt", token);
-            springCookie.setPath("/");
-            springCookie.setMaxAge(24*3600*3600);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authResult);
+            SecurityContextHolder.setContext(context);
 
-            springCookie.isHttpOnly();
-            response.addCookie(springCookie);
 
         }
 

@@ -1,12 +1,12 @@
 package com.projects.edith.models;
 
-import lombok.Data;
 
+import lombok.Data;
 import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "User")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,5 +16,6 @@ public class User {
     private String email;
     private String password;
     private String location;
+
 }
 

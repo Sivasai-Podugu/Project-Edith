@@ -28,7 +28,7 @@ export const Login = () => {
     const onSubmit = async (data: LoginTypes) => {          
         await api.post("/login",JSON.stringify(data))
             .then(response=>{
-                localStorage.setItem("Jwt",response.data.jwt)
+                localStorage.setItem("X-AUTH",response.data.jwt)
                  
                 setError(false)
                 navigate("/chat");

@@ -3,8 +3,8 @@ package com.projects.edith.services;
 
 import com.projects.edith.exception.CustomException;
 import com.projects.edith.models.Message;
-import com.projects.edith.repo.MessageRepository;
-import com.projects.edith.repo.UserRepository;
+import com.projects.edith.repositories.MessageRepository;
+import com.projects.edith.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class MessageService {
     private UserRepository userRepository;
     public ResponseEntity<?> save(Message message,String ownerEmail){
         try{
-            message.setSenderid(userRepository.findByEmail(ownerEmail).getId());
+            message.setSenderId(userRepository.findByEmail(ownerEmail).getId());
             return ResponseEntity.ok(messageRepository.save(message));
         }catch(Exception e){
             String errorMessage = "An error occurred while sending message: " + e.getMessage();
@@ -30,7 +30,7 @@ public class MessageService {
     public ResponseEntity<?> getHistory(Integer id2,String ownerEmail){
         try{
             Integer id1 = userRepository.findByEmail(ownerEmail).getId();
-            return ResponseEntity.ok(messageRepository.findMessagesAndDetailsBetweenUsers(id1,id2));
+            return ResponseEntity.ok(messageRepository.findAllBySenderIdAndReceiverIdOrReceiverIdAndSenderIdOrderByTimestampDesc(id1,id2,id2,id1));
         }catch (Exception e){
             String errorMessage = "An error occurred while getting history: " + e.getMessage();
             CustomException errorResponse = new CustomException(errorMessage);

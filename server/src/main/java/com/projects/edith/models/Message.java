@@ -5,32 +5,32 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "Message")
+@Table(name = "messages")
 public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    private Integer senderid;
-    private Integer receiverid;
+    @Column(name = "sender_id")
+    private Integer senderId;
+    @Column(name = "receiver_id")
+    private Integer receiverId;
 
     @ManyToOne
     @Fetch(value = FetchMode.SELECT)
-    @JoinColumn(name = "senderid", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "sender_id", referencedColumnName = "id", insertable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private User sender;
 
     @ManyToOne
     @Fetch(value = FetchMode.SELECT)
-    @JoinColumn(name = "receiverid", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id", insertable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private User receiver;

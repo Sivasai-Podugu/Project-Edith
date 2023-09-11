@@ -3,33 +3,34 @@ package com.projects.edith.models;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "Contact")
+@Table(name = "contacts")
 public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer userid;
-    private Integer contactuserid;
+    @Column(name = "user_id")
+    private Integer userId;
+    @Column(name = "contact_user_id")
+    private Integer contactUserId;
     @ManyToOne
     @Fetch(value = FetchMode.SELECT)
-    @JoinColumn(name = "userid", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private User user;
 
     @ManyToOne
     @Fetch(value = FetchMode.SELECT)
-    @JoinColumn(name = "contactuserid", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "contact_user_id", referencedColumnName = "id", insertable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private User contactuser;
+    private User contactUser;
 }
 

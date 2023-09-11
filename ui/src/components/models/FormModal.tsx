@@ -13,7 +13,6 @@ export const FormModal = ({modalType,toggleModal,fetchChat}:FormModalProps) => {
     
 
   return (
-    <>
     
     
         <>
@@ -43,6 +42,5 @@ export const FormModal = ({modalType,toggleModal,fetchChat}:FormModalProps) => {
             </div>
         </> 
        
-</>
   )
 }
